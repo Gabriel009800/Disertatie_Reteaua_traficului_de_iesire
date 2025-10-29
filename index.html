@@ -165,7 +165,43 @@ s.bind('outNode', function(e) {
 
 	  
 
+if (typeof s !== "undefined" && s.graph) {
+  s.bind('overNode', function(e) {
+    var nodeId = e.data.node.id;
+    var toKeep = s.graph.neighbors(nodeId);
+    toKeep[nodeId] = e.data.node;
 
+    s.graph.nodes().forEach(function(n) {
+      if (toKeep[n.id]) {
+        n.color = n.originalColor || n.color;
+      } else {
+        n.color = '#ddd';
+      }
+    });
+    s.graph.edges().forEach(function(edge) {
+      if (toKeep[edge.source] && toKeep[edge.target]) {
+        edge.color = edge.originalColor || edge.color;
+      } else {
+        edge.color = '#eee';
+      }
+    });
+    s.refresh();
+  });
+
+  s.bind('outNode', function() {
+    s.graph.nodes().forEach(function(n) {
+      n.color = n.originalColor || n.color;
+    });
+    s.graph.edges().forEach(function(e) {
+      e.color = e.originalColor || e.color;
+    });
+    s.refresh();
+  });
+} else {
+  console.log("Sigma instance not ready yet");
+}
+
+	
 
 
 	  
