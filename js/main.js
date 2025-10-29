@@ -154,6 +154,41 @@ sigma.canvas.labels.def = function (node, context, settings) {
 
 		
 		a.draw();
+
+
+		// --- ROTIRE RADIALĂ A LABELURILOR FĂRĂ SĂ AFECTEZE REȚEAUA ---
+a.bind('render', function() {
+  var ctx = a._core.domElements.labels;       // layerul etichetelor
+  var nodes = a._core.graph.nodes;
+  var w = ctx.width, h = ctx.height;
+  var c = ctx.getContext('2d');
+  c.save();
+  c.clearRect(0, 0, w, h);
+
+  for (var i = 0; i < nodes.length; i++) {
+    var n = nodes[i];
+    if (!n.label) continue;
+    var size = n.displaySize || n.size;
+    var fontSize = Math.max(8, size * 2.2);
+    var cx = w / 2, cy = h / 2;
+    var dx = n.displayX - cx;
+    var dy = n.displayY - cy;
+    var angle = Math.atan2(dy, dx);
+
+    // Text mereu orientat spre exterior
+    if (dx < 0) angle += Math.PI;
+
+    c.save();
+    c.translate(n.displayX, n.displayY);
+    c.rotate(angle + Math.PI / 2);   // perpendicular pe circumferință
+    c.font = fontSize + 'px Arial';
+    c.fillStyle = '#000';
+    c.fillText(n.label, size + 6, 0);
+    c.restore();
+  }
+  c.restore();
+});
+
 		configSigmaElements(config);
 	}
 
