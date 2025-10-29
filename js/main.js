@@ -107,6 +107,52 @@ function initSigma(config) {
 		    nodeActive(a.content[0])
 		});
 
+
+// --- ROTIRE LABELURI RADIAL (Sigma v1) ---
+sigma.utils.pkg('sigma.canvas.labels');
+sigma.canvas.labels.def = function (node, context, settings) {
+  var prefix = settings('prefix') || '';
+  var size = node[prefix + 'size'];
+  var label = node.label;
+
+  if (!label) return;
+  if (size < settings('labelThreshold')) return;
+
+  // Coordonate ecran ale nodului (deja transformate de cameră)
+  var x = node[prefix + 'x'];
+  var y = node[prefix + 'y'];
+
+  // Centrul canvas-ului (în pixeli)
+  var cx = context.canvas.width / 2;
+  var cy = context.canvas.height / 2;
+
+  // Unghiul față de centru
+  var angle = Math.atan2(y - cy, x - cx);
+
+  // Menține textul lizibil pe jumătatea stângă
+  if (x < cx) angle += Math.PI;
+
+  // Stil font/culoare din setări Sigma
+  var fontSize = (settings('labelSizeRatio') || 1) * size;
+  var font = settings('font') || 'Arial';
+  var color = settings('defaultLabelColor') || '#000';
+
+  context.save();
+  context.translate(x, y);
+  // PERPENDICULAR pe circumferință (radial, spre exterior)
+  context.rotate(angle + Math.PI / 2);
+  context.font = fontSize + 'px ' + font;
+  context.fillStyle = color;
+  context.fillText(label, size + 6, 0); // mărește 6 dacă vrei mai mult spațiu
+  context.restore();
+};
+
+
+
+
+		
+
+		
 		a.draw();
 		configSigmaElements(config);
 	}
